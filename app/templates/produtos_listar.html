@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block titulo_pagina %}
+    <h2 class="titulo_pagina">Produtos</h2>
+{% endblock %}  
+
+{% block conteudo %}
+
+    <div style="margin-left: 5px;">
+        <a class="btn medium" href="{% url 'produtos' acao='incluir' %}">Incluir</a>
+    </div>
+
+    <!-- TABELA HTML COM OS REGISTROS -->
+    <table>
+        <!-- CABECALHO DA TABELA HTML -->
+        <thead>
+            <tr>
+                <th class="id">ID</th>
+                <th>Produto</th>
+                <th>Preço Unitário</th>
+                <th>Estoque</th>
+                <th>Categoria</th>
+                <th>Ações</th>
+            </tr>
+        </thead>
+        <!-- LINHAS DA TABELA HTML CONTENDO OS REGISTROS -->
+        <tbody>
+            <!-- LOOP PARA PEGAR CADA REGISTRO -->
+            {% for reg in registros %}
+            <tr>
+                <td>{{ reg.0 }}</td>
+                <td>{{ reg.1 }}</td>
+                <td>{{ reg.2 }}</td>
+                <td>{{ reg.3|default_if_none:'' }}</td>
+                <td>{{ reg.5 }}</td>
+                <td>
+                    <a class="btn small" href="{% url 'produtos' acao='alterar' id=reg.0 %}">Alterar</a>
+                    
+                    <a class="btn-del small" href="{% url 'produtos' acao='excluir' id=reg.0 %}">Excluir</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}
+
+

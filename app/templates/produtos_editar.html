@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block titulo_pagina %}
+    <h2 class="titulo_pagina">Produtos - {{ acao }}</h2>
+{% endblock %}
+
+{% block conteudo %}
+
+{% if acao == 'Exclusão' %}
+    <p>Deseja realmente excluir este registro?</p>
+    <br>
+    <p>
+        Descrição: <strong>{{ obj.descricao }}</strong>
+    </p>
+    <br>
+    <form action="/produtos/salvar/" method="post">
+        {% csrf_token %}
+        <input id="acao" name="acao" type="hidden" value="{{ acao }}">
+        <input type="hidden" id="id" name="id" value="{{obj.id}}">
+        <input class="btn-del" type="submit" value="Excluir">
+        <a class="btn-def" href="{% url 'produtos' %}">Cancelar</a>
+    </form>
+    
+
+{% else %}
+    <form action="/produtos/salvar/" method="post">
+        {% csrf_token %}
+
+        <input id="acao" name="acao" type="hidden" value="{{ acao }}">
+
+        <label for="id">ID: </label>
+        <input id="id" type="text" name="id" value="{{ obj.id }}" readonly style="background-color: rgb(224, 224, 224);">
+        <br><br>
+        <label for="descricao">Descrição: </label>
+        <input id="descricao" type="text" name="descricao" value="{{ obj.descricao }}">
+        <br><br>
+        <label for="preco_unitario">Preço Unitário: </label>
+        <input id="preco_unitario" type="text" name="preco_unitario" value="{{ obj.preco_unitario|default_if_none:'' }}">
+        <br><br>
+        <label for="quantidade_estoque">Qtd. Estoque: </label>
+        <input id="quantidade_estoque" type="text" name="quantidade_estoque" value="{{ obj.quantidade_estoque|default_if_none:'' }}">
+        <br><br>
+        <label for="categoria_id">Categoria: </label>
+        <select name='categoria_id'>
+                <option>-----Selecione-----</option>
+                {% for cat in categorias %}
+                    <option 
+                        value="{{ cat.0 }}" 
+                        {% if obj.categoria_id == cat.0 %} selected {% endif %}
+                    > 
+                        {{ cat.1 }}
+                    </option>
+                {% endfor %}
+
+        </select>
+        </p>
+        <br>
+        <label for=""></label>
+        <button class="btn" type="submit">Salvar</button>
+        &nbsp;
+        <a class="btn-def" href="{% url 'produtos' %}">Cancelar</a>
+    </form>
+{% endif%}
+
+{% endblock %}

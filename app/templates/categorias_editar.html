@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block titulo_pagina %}
+    <h2 class="titulo_pagina">Categorias - {{ acao }}</h2>
+{% endblock %}
+
+{% block conteudo %}
+
+{% if acao == 'Exclusão' %}
+    <p>Deseja realmente excluir este registro?</p>
+    <br>
+    <p>
+        Descrição: <strong>{{ obj.descricao }}</strong>
+    </p>
+    <br>
+    <form action="/categorias/salvar/" method="post">
+        {% csrf_token %}
+        <input id="acao" name="acao" type="hidden" value="{{ acao }}">
+        
+        <input type="hidden" id="id" name="id" value="{{obj.id}}">
+        <input class="btn-del" type="submit" value="Excluir">
+        <a class="btn-def" href="{% url 'categorias' %}">Cancelar</a>
+
+    </form>
+    
+
+{% else %}
+    <form action="/categorias/salvar/" method="post">
+        {% csrf_token %}
+
+        <input id="acao" name="acao" type="hidden" value="{{ acao }}">
+
+        <label for="id">ID: </label>
+        <input id="id" type="text" name="id" value="{{ obj.id }}" readonly style="background-color: rgb(224, 224, 224);">
+        <br><br>
+
+        <label for="descricao">Descrição: </label>
+        <input id="descricao" type="text" name="descricao" value="{{ obj.descricao }}">
+        <br><br>
+        <label for=""></label>
+        <button class="btn" type="submit">Salvar</button>
+        &nbsp;
+        <button class="btn-def" formaction="{% url 'categorias' %}">Cancelar</button>        
+
+    </form>
+{% endif%}
+
+{% endblock %}

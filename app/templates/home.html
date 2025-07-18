@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block titulo_pagina %}
+<h2 class="titulo_pagina">Home</h2>
+{% endblock %}
+
+{% block conteudo %}
+<h1>Seja bem vindo!!!</h1>
+<br>
+<p>
+    Nesta aplicação serão demonstrados os seguintes <strong>Padrões de Projeto</strong>:
+    <br><br>
+    <ul>
+        <li>
+            <h1><strong>DAO</strong> <i style="font-weight: normal;">(Data Access Objects)</i></h1>
+            &nbsp;&nbsp;&nbsp;&nbsp; 
+            <a href="{% static 'imagens/dao.png' %}" target="_blank">
+                <img src="{% static 'imagens/dao.png' %}" width="90">
+            </a>
+            <p>&nbsp;</p>
+        </li>
+        <li>
+            <h1><strong>Singleton</strong></h1>
+            &nbsp;&nbsp;&nbsp;&nbsp;
+            <a href="{% static 'imagens/singleton.png' %}" target="_blank">
+                <img src="{% static 'imagens/singleton.png' %}" width="110">
+            </a>
+            <p>&nbsp;</p>
+        </li>
+        <li>
+            <h1><strong>Template Method</strong></h1>
+            &nbsp;&nbsp;&nbsp;&nbsp; 
+            <a href="{% static 'imagens/template_method.png' %}" target="_blank">
+                <img src="{% static 'imagens/template_method.png' %}" width="80">
+            </a>
+            <p>&nbsp;</p>
+        </li>
+    </ul>
+</p>
+
+{% endblock %}
