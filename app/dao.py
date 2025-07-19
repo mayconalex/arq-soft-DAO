@@ -90,3 +90,93 @@ class CategoriaDAO(DAO):
         reg = self.executar_select(sql)[0]
         # converte o registro para objeto e retorna
         return Categoria(id=reg[0], descricao=reg[1])
+
+class ProdutoDAO(DAO):
+
+    def incluir(self, obj: Produto):
+        qtd_estoque = 'NULL' if obj.quantidade_estoque is None or obj.quantidade_estoque == '' else obj.quantidade_estoque
+
+        sql = f'''
+            INSERT INTO Produto (
+                descricao, 
+                preco_unitario, 
+                quantidade_estoque, 
+                categoria_id
+            )
+            VALUES(
+                '{obj.descricao}', 
+                {obj.preco_unitario}, 
+                {qtd_estoque}, 
+                {obj.categoria.id}
+            );
+        '''
+        self.executar_sql(sql)
+
+    def alterar(self, obj: Produto):
+        qtd_estoque = 'NULL' if obj.quantidade_estoque is None or obj.quantidade_estoque == '' else obj.quantidade_estoque
+        
+        sql = f''' 
+            UPDATE Produto
+            SET descricao          = '{obj.descricao}', 
+                preco_unitario     = {obj.preco_unitario}, 
+                quantidade_estoque = {qtd_estoque}, 
+                categoria_id       = {obj.categoria.id}
+            WHERE id = {obj.id};
+        '''
+        self.executar_sql(sql)
+
+    def excluir(self, obj: Produto):
+        sql = f"DELETE FROM Produto WHERE id = {obj.id}"
+        self.executar_sql(sql)
+
+    def selecionar_todos(self) -> list[Produto]:
+        sql = '''
+            SELECT  pro.id,
+                    pro.descricao, 
+                    pro.preco_unitario,
+                    pro.quantidade_estoque,
+                    cat.id as categoria_id,
+                    cat.descricao as categoria_descricao
+            FROM Produto pro
+            INNER JOIN Categoria cat ON cat.id = pro.categoria_id
+            ORDER BY pro.descricao
+        '''
+        registros = self.executar_select(sql)
+        
+        dados = []
+        for reg in registros:
+            categoria_obj = Categoria(id=reg[4], descricao=reg[5])
+            produto_obj = Produto(
+                id=reg[0],
+                descricao=reg[1],
+                preco_unitario=reg[2],
+                quantidade_estoque=reg[3],
+                categoria=categoria_obj
+            )
+            dados.append(produto_obj)
+        
+        return dados
+
+    def selecionar_um(self, id: int) -> Produto:
+        sql = f'''
+            SELECT  pro.id,
+                    pro.descricao, 
+                    pro.preco_unitario,
+                    pro.quantidade_estoque,
+                    cat.id as categoria_id,
+                    cat.descricao as categoria_descricao
+            FROM Produto pro
+            INNER JOIN Categoria cat ON cat.id = pro.categoria_id
+            WHERE pro.id = {id}
+        '''
+        reg = self.executar_select(sql)[0]
+        
+        categoria_obj = Categoria(id=reg[4], descricao=reg[5])
+        produto_obj = Produto(
+            id=reg[0],
+            descricao=reg[1],
+            preco_unitario=reg[2],
+            quantidade_estoque=reg[3],
+            categoria=categoria_obj
+        )
+        return produto_obj

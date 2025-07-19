@@ -28,20 +28,18 @@
             <!-- LOOP PARA PEGAR CADA REGISTRO -->
             {% for reg in registros %}
             <tr>
-                <td>{{ reg.0 }}</td>
-                <td>{{ reg.1 }}</td>
-                <td>{{ reg.2 }}</td>
-                <td>{{ reg.3|default_if_none:'' }}</td>
-                <td>{{ reg.5 }}</td>
+                <td>{{ reg.id }}</td>
+                <td>{{ reg.descricao }}</td>
+                <td>{{ reg.preco_unitario }}</td>
+                <td>{{ reg.quantidade_estoque|default_if_none:'' }}</td>
+                <td>{{ reg.categoria.descricao }}</td>
                 <td>
-                    <a class="btn small" href="{% url 'produtos' acao='alterar' id=reg.0 %}">Alterar</a>
+                    <a class="btn small" href="{% url 'produtos' acao='alterar' id=reg.id %}">Alterar</a>
                     
-                    <a class="btn-del small" href="{% url 'produtos' acao='excluir' id=reg.0 %}">Excluir</a>
+                    <a class="btn-del small" href="{% url 'produtos' acao='excluir' id=reg.id %}">Excluir</a>
                 </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
 {% endblock %}
-
-

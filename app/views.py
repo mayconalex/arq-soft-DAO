@@ -71,117 +71,65 @@ def categorias(request, acao=None, id=None):
 
 def produtos(request, acao=None, id=None):
     try:
+        # DAOs que serão utilizados neste metodo
+        dao_produto = ProdutoDAO()
+        dao_categoria = CategoriaDAO() # Necessário para o formulário de edição
+
         # listar registros 
         if acao is None:
-            # define o comando SQL que será executado
-            sql = '''
-                SELECT  pro.id,
-                        pro.descricao, 
-                        pro.preco_unitario,
-                        pro.quantidade_estoque,
-                        pro.categoria_id,
-                        cat.descricao as 'categoria'
-                        
-                FROM Produto pro
-                INNER JOIN Categoria cat ON cat.id = pro.categoria_id
-
-                ORDER BY pro.descricao
-            '''
-            
-            # registros = executar_select(sql)
-
-            # define a pagina a ser carregada, adicionando os registros das tabelas 
+            registros = dao_produto.selecionar_todos()
             return render(request, 'produtos_listar.html', context={'registros': registros})
         
         # salvar registro
         elif acao == 'salvar':
             form_data = request.POST
-
             acao_form = form_data['acao']
 
+            categoria_obj = dao_categoria.selecionar_um(int(form_data['categoria_id']))
+
             if acao_form == 'Inclusão':
-                qtd_estoque = 'NULL' if form_data['quantidade_estoque'] == '' else form_data['quantidade_estoque']
+                produto_obj = Produto(
+                    id=None,
+                    descricao=form_data['descricao'],
+                    preco_unitario=float(form_data['preco_unitario']),
+                    quantidade_estoque=form_data['quantidade_estoque'] or None,
+                    categoria=categoria_obj
+                )
+                dao_produto.incluir(produto_obj)
 
-                sql = f'''
-                            INSERT INTO Produto (
-                                descricao, 
-                                preco_unitario, 
-                                quantidade_estoque, 
-                                categoria_id
-                            )
-                            VALUES(
-                                '{form_data['descricao']}', 
-                                {form_data['preco_unitario']}, 
-                                {qtd_estoque}, 
-                                {form_data['categoria_id']}
-                            );
-                        '''
-            
             elif acao_form == 'Exclusão':
-                sql = f"DELETE FROM Produto WHERE id = {form_data['id']}"
-            
-            else:
-                qtd_estoque = 'NULL' if form_data['quantidade_estoque'] == '' else form_data['quantidade_estoque']
+                produto_obj = Produto(id=int(form_data['id']), descricao=None, preco_unitario=None, quantidade_estoque=None, categoria=None)
+                dao_produto.excluir(produto_obj)
 
-                sql = f''' 
-                    UPDATE Produto
-                    SET descricao          = '{form_data['descricao']}', 
-                        preco_unitario     = {form_data['preco_unitario']}, 
-                        quantidade_estoque = {qtd_estoque}, 
-                        categoria_id       = {form_data['categoria_id']}
-                    WHERE id = {form_data['id']};
-                '''
+            else: # Alteração
+                produto_obj = Produto(
+                    id=int(form_data['id']),
+                    descricao=form_data['descricao'],
+                    preco_unitario=float(form_data['preco_unitario']),
+                    quantidade_estoque=form_data['quantidade_estoque'] or None,
+                    categoria=categoria_obj
+                )
+                dao_produto.alterar(produto_obj)
 
-            # executar_sql(sql)
-
-            # Sempre retornar um HttpResponseRedirect após processar dados "POST". 
-            # Isso evita que os dados sejam postados 2 vezes caso usuário clicar "Voltar".
-            return HttpResponseRedirect( reverse("produtos") )
+            return HttpResponseRedirect(reverse("produtos"))
         
         # inserir registro
         elif acao == 'incluir':
-            return render(request, 'produtos_editar.html', {'acao': 'Inclusão', 'categorias': obter_categorias()})
+            categorias_list = dao_categoria.selecionar_todos()
+            return render(request, 'produtos_editar.html', {'acao': 'Inclusão', 'categorias': categorias_list})
         
         # alterar ou excluir
         elif acao in ['alterar', 'excluir']:
-            # seleciona o registro pelo id informado
-            sql = f'''
-                SELECT  pro.id,
-                        pro.descricao, 
-                        pro.preco_unitario,
-                        pro.quantidade_estoque,
-                        pro.categoria_id,
-                        cat.descricao as 'categoria'
-                        
-                FROM Produto pro
-                INNER JOIN Categoria cat ON cat.id = pro.categoria_id
-
-                WHERE pro.id={id}    
-            '''
-
-            reg = executar_select(sql)[0]
-            obj = {
-                'id': reg[0], 
-                'descricao': reg[1],
-                'preco_unitario': reg[2],
-                'quantidade_estoque': reg[3],
-                'categoria_id': reg[4],
-                'categoria': reg[5],
-            }
-
-            acao = 'Alteração' if acao == 'alterar' else 'Exclusão'
+            obj = dao_produto.selecionar_um(id)
+            categorias_list = dao_categoria.selecionar_todos()
+            acao_display = 'Alteração' if acao == 'alterar' else 'Exclusão'
 
             return render(request, 'produtos_editar.html', 
-                          {'acao': acao, 'obj': obj, 'categorias': obter_categorias()})
+                          {'acao': acao_display, 'obj': obj, 'categorias': categorias_list})
         
         # acao INVALIDA
         else:
             raise Exception('Ação inválida')
 
-    # se ocorreu algunm erro, insere a mensagem para ser exibida no contexto da página 
     except Exception as err:
         return render(request, 'home.html', context={'ERRO': err})
-
-
-
-

@@ -13,7 +13,7 @@
         Descrição: <strong>{{ obj.descricao }}</strong>
     </p>
     <br>
-    <form action="/produtos/salvar/" method="post">
+    <form action="{% url 'produtos' acao='salvar' %}" method="post">
         {% csrf_token %}
         <input id="acao" name="acao" type="hidden" value="{{ acao }}">
         <input type="hidden" id="id" name="id" value="{{obj.id}}">
@@ -23,7 +23,7 @@
     
 
 {% else %}
-    <form action="/produtos/salvar/" method="post">
+    <form action="{% url 'produtos' acao='salvar' %}" method="post">
         {% csrf_token %}
 
         <input id="acao" name="acao" type="hidden" value="{{ acao }}">
@@ -45,10 +45,10 @@
                 <option>-----Selecione-----</option>
                 {% for cat in categorias %}
                     <option 
-                        value="{{ cat.0 }}" 
-                        {% if obj.categoria_id == cat.0 %} selected {% endif %}
+                        value="{{ cat.id }}" 
+                        {% if obj.categoria.id == cat.id %} selected {% endif %}
                     > 
-                        {{ cat.1 }}
+                        {{ cat.descricao }}
                     </option>
                 {% endfor %}
 
