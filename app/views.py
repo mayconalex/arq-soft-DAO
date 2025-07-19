@@ -85,31 +85,35 @@ def produtos(request, acao=None, id=None):
             form_data = request.POST
             acao_form = form_data['acao']
 
-            categoria_obj = dao_categoria.selecionar_um(int(form_data['categoria_id']))
-
-            if acao_form == 'Inclusão':
-                produto_obj = Produto(
-                    id=None,
-                    descricao=form_data['descricao'],
-                    preco_unitario=float(form_data['preco_unitario']),
-                    quantidade_estoque=form_data['quantidade_estoque'] or None,
-                    categoria=categoria_obj
-                )
-                dao_produto.incluir(produto_obj)
-
-            elif acao_form == 'Exclusão':
+            if acao_form == 'Exclusão':
+                # Para exclusão, só precisamos do ID.
                 produto_obj = Produto(id=int(form_data['id']), descricao=None, preco_unitario=None, quantidade_estoque=None, categoria=None)
                 dao_produto.excluir(produto_obj)
 
-            else: # Alteração
-                produto_obj = Produto(
-                    id=int(form_data['id']),
-                    descricao=form_data['descricao'],
-                    preco_unitario=float(form_data['preco_unitario']),
-                    quantidade_estoque=form_data['quantidade_estoque'] or None,
-                    categoria=categoria_obj
-                )
-                dao_produto.alterar(produto_obj)
+            else:
+                # Para Inclusão e Alteração, precisamos do objeto Categoria.
+                # Movemos a busca da categoria para dentro deste bloco.
+                categoria_obj = dao_categoria.selecionar_um(int(form_data['categoria_id']))
+
+                if acao_form == 'Inclusão':
+                    produto_obj = Produto(
+                        id=None,
+                        descricao=form_data['descricao'],
+                        preco_unitario=float(form_data['preco_unitario']),
+                        quantidade_estoque=form_data['quantidade_estoque'] or None,
+                        categoria=categoria_obj
+                    )
+                    dao_produto.incluir(produto_obj)
+
+                else: # Alteração
+                    produto_obj = Produto(
+                        id=int(form_data['id']),
+                        descricao=form_data['descricao'],
+                        preco_unitario=float(form_data['preco_unitario']),
+                        quantidade_estoque=form_data['quantidade_estoque'] or None,
+                        categoria=categoria_obj
+                    )
+                    dao_produto.alterar(produto_obj)
 
             return HttpResponseRedirect(reverse("produtos"))
         
