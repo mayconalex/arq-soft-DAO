@@ -71,9 +71,8 @@ def categorias(request, acao=None, id=None):
 
 def produtos(request, acao=None, id=None):
     try:
-        # DAOs que serão utilizados neste metodo
         dao_produto = ProdutoDAO()
-        dao_categoria = CategoriaDAO() # Necessário para o formulário de edição
+        dao_categoria = CategoriaDAO()
 
         # listar registros 
         if acao is None:
@@ -86,13 +85,10 @@ def produtos(request, acao=None, id=None):
             acao_form = form_data['acao']
 
             if acao_form == 'Exclusão':
-                # Para exclusão, só precisamos do ID.
                 produto_obj = Produto(id=int(form_data['id']), descricao=None, preco_unitario=None, quantidade_estoque=None, categoria=None)
                 dao_produto.excluir(produto_obj)
 
             else:
-                # Para Inclusão e Alteração, precisamos do objeto Categoria.
-                # Movemos a busca da categoria para dentro deste bloco.
                 categoria_obj = dao_categoria.selecionar_um(int(form_data['categoria_id']))
 
                 if acao_form == 'Inclusão':
@@ -105,7 +101,7 @@ def produtos(request, acao=None, id=None):
                     )
                     dao_produto.incluir(produto_obj)
 
-                else: # Alteração
+                else:
                     produto_obj = Produto(
                         id=int(form_data['id']),
                         descricao=form_data['descricao'],
